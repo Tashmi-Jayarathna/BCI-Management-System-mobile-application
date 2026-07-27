@@ -62,7 +62,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 const Text(
-                  'Business & College Institute Academic Management System',
+                  'Benedict XVI Catholic International Institute of Higher Education, Institute Academic Management System',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 14,

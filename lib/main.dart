@@ -100,7 +100,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 applicationIcon: const Icon(Icons.school, size: 48, color: Color(0xFF1E3A8A)),
                 children: [
                   const SizedBox(height: 12),
-                  const Text('Comprehensive Mobile Academic Management System for Business & College Institute (BCI).'),
+                  const Text('Comprehensive Mobile Academic Management System for Benedict XVI Catholic International Institute of Higher Education, (BCI).'),
                   const SizedBox(height: 8),
                   Text('Total Students: ${_repository.totalStudents}'),
                   Text('Total Courses: ${_repository.totalCourses}'),
