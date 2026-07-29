@@ -10,7 +10,6 @@ class BCIRepository extends ChangeNotifier {
     _seedInitialData();
   }
 
-  // Getters
   List<Student> get students => List.unmodifiable(_students);
   List<Course> get courses => List.unmodifiable(_courses);
 
@@ -19,7 +18,6 @@ class BCIRepository extends ChangeNotifier {
   int get totalEnrollments =>
       _students.fold(0, (sum, s) => sum + s.enrolledCourseIds.length);
 
-  // Departments List
   List<String> get availableDepartments => [
         'All',
         'Computer Science',
@@ -38,7 +36,7 @@ class BCIRepository extends ChangeNotifier {
         title: 'Introduction to Computer Science',
         credits: 4,
         department: 'Computer Science',
-        instructor: 'Dr. Alan Turing',
+        instructor: 'Dr. Waruna',
         description: 'Foundations of computing, algorithms, and logic.',
       ),
       Course(
@@ -47,7 +45,7 @@ class BCIRepository extends ChangeNotifier {
         title: 'Principles of Management',
         credits: 3,
         department: 'Business Administration',
-        instructor: 'Prof. Peter Drucker',
+        instructor: 'Prof. Sujith',
         description: 'Core concepts in modern enterprise management.',
       ),
       Course(
@@ -56,7 +54,7 @@ class BCIRepository extends ChangeNotifier {
         title: 'Data Structures & Algorithms',
         credits: 4,
         department: 'Data Science',
-        instructor: 'Dr. Donald Knuth',
+        instructor: 'Prof.Thushari',
         description: 'Advanced trees, graphs, sorting, and dynamic programming.',
       ),
       Course(
@@ -65,7 +63,7 @@ class BCIRepository extends ChangeNotifier {
         title: 'Mobile App Architecture',
         credits: 3,
         department: 'Software Engineering',
-        instructor: 'Eng. Grace Hopper',
+        instructor: 'Dr.Susara',
         description: 'Cross-platform mobile design patterns and state management.',
       ),
       Course(
@@ -74,7 +72,7 @@ class BCIRepository extends ChangeNotifier {
         title: 'Cybersecurity Fundamentals',
         credits: 3,
         department: 'Information Technology',
-        instructor: 'Dr. Claude Shannon',
+        instructor: 'Mr.Sohan',
         description: 'Network security, encryption, and threat vectors.',
       ),
     ]);
@@ -83,8 +81,8 @@ class BCIRepository extends ChangeNotifier {
       Student(
         id: 's1',
         studentId: 'BCI-2024-001',
-        name: 'Alice Smith',
-        email: 'alice.smith@bci.edu',
+        name: 'Hasanthi Sandeepani',
+        email: 'Hasanthisandeepani@bci.edu',
         phone: '+1 (555) 234-5678',
         department: 'Computer Science',
         enrollmentYear: '2024',
@@ -93,8 +91,8 @@ class BCIRepository extends ChangeNotifier {
       Student(
         id: 's2',
         studentId: 'BCI-2024-002',
-        name: 'Bob Johnson',
-        email: 'bob.johnson@bci.edu',
+        name: 'Senal Navod',
+        email: 'senalnavod@bci.edu',
         phone: '+1 (555) 876-5432',
         department: 'Business Administration',
         enrollmentYear: '2024',
@@ -103,8 +101,8 @@ class BCIRepository extends ChangeNotifier {
       Student(
         id: 's3',
         studentId: 'BCI-2025-003',
-        name: 'Catherine Vance',
-        email: 'catherine.v@bci.edu',
+        name: 'Tharindu Dilshan',
+        email: 'Tharindudilshan@bci.edu',
         phone: '+1 (555) 345-6789',
         department: 'Software Engineering',
         enrollmentYear: '2025',
@@ -113,8 +111,8 @@ class BCIRepository extends ChangeNotifier {
       Student(
         id: 's4',
         studentId: 'BCI-2025-004',
-        name: 'David Miller',
-        email: 'david.m@bci.edu',
+        name: 'Kavindu Hasinsa',
+        email: 'Kavinduhasinsa@bci.edu',
         phone: '+1 (555) 987-6543',
         department: 'Data Science',
         enrollmentYear: '2025',
@@ -123,7 +121,6 @@ class BCIRepository extends ChangeNotifier {
     ]);
   }
 
-  // Lookup Helpers
   Student? getStudentById(String id) {
     try {
       return _students.firstWhere((s) => s.id == id);
@@ -150,7 +147,6 @@ class BCIRepository extends ChangeNotifier {
     return _students.where((s) => s.enrolledCourseIds.contains(courseId)).toList();
   }
 
-  // Student CRUD
   void addStudent(Student student) {
     _students.add(student);
     notifyListeners();
@@ -169,7 +165,6 @@ class BCIRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Course CRUD
   void addCourse(Course course) {
     _courses.add(course);
     notifyListeners();
@@ -185,7 +180,6 @@ class BCIRepository extends ChangeNotifier {
 
   void deleteCourse(String courseId) {
     _courses.removeWhere((c) => c.id == courseId);
-    // Also remove course from all enrolled students
     for (var i = 0; i < _students.length; i++) {
       if (_students[i].enrolledCourseIds.contains(courseId)) {
         final updatedList = List<String>.from(_students[i].enrolledCourseIds)
@@ -196,7 +190,6 @@ class BCIRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Enrollment operations
   void enrolStudentInCourse(String studentId, String courseId) {
     final index = _students.indexWhere((s) => s.id == studentId);
     if (index != -1) {
@@ -229,7 +222,6 @@ class BCIRepository extends ChangeNotifier {
     }
   }
 
-  // Search & Filter
   List<Student> searchStudents(String query, String departmentFilter) {
     return _students.where((s) {
       final matchesQuery = query.isEmpty ||
@@ -256,7 +248,6 @@ class BCIRepository extends ChangeNotifier {
     }).toList();
   }
 
-  // Analytics Helpers
   Map<String, int> getDepartmentStudentCount() {
     final Map<String, int> counts = {};
     for (var s in _students) {

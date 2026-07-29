@@ -31,7 +31,6 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
   }
 
   void _showBatchEnrollmentModal(Student student) {
-    // Current enrolled courses
     final enrolledIds = List<String>.from(student.enrolledCourseIds);
 
     showModalBottomSheet(
@@ -49,7 +48,6 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Handle indicator
                   Center(
                     child: Container(
                       width: 40,
@@ -186,7 +184,6 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
   Widget build(BuildContext context) {
     final students = widget.repository.students;
 
-    // Ensure selected student exists
     if (_selectedStudentId != null && !students.any((s) => s.id == _selectedStudentId)) {
       _selectedStudentId = students.isNotEmpty ? students.first.id : null;
     }
@@ -205,7 +202,6 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Student Selection Header Card
             Card(
               elevation: 3,
               child: Padding(
@@ -255,7 +251,6 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Enrolled Courses for selected student
             if (selectedStudent != null) ...[
               Card(
                 child: Padding(

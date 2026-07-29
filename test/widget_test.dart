@@ -67,12 +67,10 @@ void main() {
       final studentId = repo.students.first.id;
       final courseId = repo.courses.last.id;
 
-      // Enrol
       repo.enrolStudentInCourse(studentId, courseId);
       final student = repo.getStudentById(studentId);
       expect(student?.enrolledCourseIds.contains(courseId), isTrue);
 
-      // Un-enrol
       repo.unEnrolStudentFromCourse(studentId, courseId);
       final updatedStudent = repo.getStudentById(studentId);
       expect(updatedStudent?.enrolledCourseIds.contains(courseId), isFalse);
@@ -96,19 +94,16 @@ void main() {
       await tester.pumpWidget(const BCIManagementApp());
       await tester.pumpAndSettle();
 
-      // Navigate to Students tab
       await tester.tap(find.byIcon(Icons.people_outline));
       await tester.pumpAndSettle();
       expect(find.text('Student Records Management'), findsOneWidget);
       expect(find.text('Add Student'), findsOneWidget);
 
-      // Navigate to Courses tab
       await tester.tap(find.byIcon(Icons.menu_book_outlined));
       await tester.pumpAndSettle();
       expect(find.text('Course Records Management'), findsOneWidget);
       expect(find.text('Add Course'), findsOneWidget);
 
-      // Navigate to Enrollment tab
       await tester.tap(find.byIcon(Icons.assignment_turned_in_outlined));
       await tester.pumpAndSettle();
       expect(find.text('Student Enrollment Hub'), findsOneWidget);

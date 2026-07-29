@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class BCITheme {
-  static const Color primaryColor = Color(0xFF1E3A8A); // Deep Indigo
-  static const Color secondaryColor = Color(0xFF0D9488); // Teal
-  static const Color accentColor = Color(0xFF3B82F6); // Vibrant Blue
-  static const Color backgroundColor = Color(0xFFF8FAFC); // Slate Soft White
+  static const Color primaryColor = Color(0xFF1E3A8A); 
+  static const Color secondaryColor = Color(0xFF0D9488); 
+  static const Color accentColor = Color(0xFF3B82F6); 
+  static const Color backgroundColor = Color(0xFFF8FAFC); 
   static const Color surfaceColor = Colors.white;
 
   static ThemeData get lightTheme {

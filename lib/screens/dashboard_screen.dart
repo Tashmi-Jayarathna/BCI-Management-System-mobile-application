@@ -27,7 +27,6 @@ class DashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Banner Card
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -78,7 +77,7 @@ class DashboardScreen extends StatelessWidget {
                         backgroundColor: Colors.white,
                         foregroundColor: Theme.of(context).colorScheme.primary,
                       ),
-                      onPressed: () => onNavigateToTab(1), // Students tab
+                      onPressed: () => onNavigateToTab(1), 
                       icon: const Icon(Icons.person_add_alt_1),
                       label: const Text('Manage Students'),
                     ),
@@ -87,7 +86,7 @@ class DashboardScreen extends StatelessWidget {
                         backgroundColor: Colors.white.withValues(alpha: 0.2),
                         foregroundColor: Colors.white,
                       ),
-                      onPressed: () => onNavigateToTab(2), // Courses tab
+                      onPressed: () => onNavigateToTab(2), 
                       icon: const Icon(Icons.book),
                       label: const Text('Manage Courses'),
                     ),
@@ -98,14 +97,12 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Overview Metrics Header
           const Text(
             'System Overview',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
 
-          // Stats Grid
           LayoutBuilder(
             builder: (context, constraints) {
               final isSmallMobile = constraints.maxWidth < 360;
@@ -158,7 +155,6 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Department Breakdown Section
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -223,7 +219,6 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Quick Recent Students List
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16.0),

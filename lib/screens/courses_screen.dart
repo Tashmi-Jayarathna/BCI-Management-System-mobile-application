@@ -130,7 +130,6 @@ class _CoursesScreenState extends State<CoursesScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Responsive Search & Filter
             if (isNarrow) ...[
               TextField(
                 controller: _searchController,
@@ -228,7 +227,6 @@ class _CoursesScreenState extends State<CoursesScreen> {
             ],
             const SizedBox(height: 16),
 
-            // Course Count Indicator
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -244,7 +242,6 @@ class _CoursesScreenState extends State<CoursesScreen> {
             ),
             const SizedBox(height: 10),
 
-            // Course List
             Expanded(
               child: filteredCourses.isEmpty
                   ? Center(

@@ -130,7 +130,6 @@ class _StudentsScreenState extends State<StudentsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Responsive Search Bar & Department Filter
             if (isNarrow) ...[
               TextField(
                 controller: _searchController,
@@ -228,7 +227,6 @@ class _StudentsScreenState extends State<StudentsScreen> {
             ],
             const SizedBox(height: 16),
 
-            // Student Count Indicator
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -244,7 +242,6 @@ class _StudentsScreenState extends State<StudentsScreen> {
             ),
             const SizedBox(height: 10),
 
-            // Student List
             Expanded(
               child: filteredStudents.isEmpty
                   ? Center(
