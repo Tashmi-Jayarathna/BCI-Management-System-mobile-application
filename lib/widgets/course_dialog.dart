@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/course_model.dart';
+import '../core/di/app_dependency_provider.dart';
 
 class CourseDialog extends StatefulWidget {
   final Course? course;
@@ -64,6 +65,22 @@ class _CourseDialogState extends State<CourseDialog> {
         instructor: _instructorController.text.trim(),
         description: _descriptionController.text.trim(),
       );
+
+      // Single Responsibility & Dependency Inversion: Delegate validation to CourseValidator
+      final validator = AppDependencyProvider.of(context).courseValidator;
+      final validationResult = validator.validate(course);
+
+      if (!validationResult.isValid) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(validationResult.errors.join('\n')),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
       widget.onSave(course);
       Navigator.of(context).pop();
     }

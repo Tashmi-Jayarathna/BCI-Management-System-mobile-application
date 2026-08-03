@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/bci_repository.dart';
+import '../core/di/app_dependency_provider.dart';
 
 class DashboardScreen extends StatelessWidget {
   final BCIRepository repository;
@@ -13,20 +14,23 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalStudents = repository.totalStudents;
-    final totalCourses = repository.totalCourses;
-    final totalEnrollments = repository.totalEnrollments;
-    final avgCourses = totalStudents > 0
-        ? (totalEnrollments / totalStudents).toStringAsFixed(1)
-        : '0.0';
+    // Dependency Inversion Principle: Access abstract analytics service via DI container
+    final deps = AppDependencyProvider.of(context);
+    final analytics = deps.analyticsService;
+    final studentRepo = deps.studentRepository;
 
-    final deptStats = repository.getDepartmentStudentCount();
+    final totalStudents = analytics.totalStudents;
+    final totalCourses = analytics.totalCourses;
+    final totalEnrollments = analytics.totalEnrollments;
+    final avgCourses = analytics.averageCoursesPerStudent.toStringAsFixed(1);
+    final deptStats = analytics.getDepartmentStudentDistribution();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Banner Card
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -34,7 +38,7 @@ class DashboardScreen extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.secondary,
+                  const Color(0xFF0F766E),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -42,8 +46,8 @@ class DashboardScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                  blurRadius: 10,
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.25),
+                  blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ],
@@ -51,20 +55,29 @@ class DashboardScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  children: [
+                    const Icon(Icons.school, color: Colors.white, size: 28),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Welcome to BCI Academic Portal',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 const Text(
-                  'Welcome to BCI Portal',
+                  'Benedict XVI Catholic International Institute of Higher Education - Student & Course Management System',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Benedict XVI Catholic International Institute of Higher Education, Institute Academic Management System',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
+                    fontSize: 13,
+                    height: 1.3,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -77,7 +90,7 @@ class DashboardScreen extends StatelessWidget {
                         backgroundColor: Colors.white,
                         foregroundColor: Theme.of(context).colorScheme.primary,
                       ),
-                      onPressed: () => onNavigateToTab(1), 
+                      onPressed: () => onNavigateToTab(1),
                       icon: const Icon(Icons.person_add_alt_1),
                       label: const Text('Manage Students'),
                     ),
@@ -86,7 +99,7 @@ class DashboardScreen extends StatelessWidget {
                         backgroundColor: Colors.white.withValues(alpha: 0.2),
                         foregroundColor: Colors.white,
                       ),
-                      onPressed: () => onNavigateToTab(2), 
+                      onPressed: () => onNavigateToTab(2),
                       icon: const Icon(Icons.book),
                       label: const Text('Manage Courses'),
                     ),
@@ -97,12 +110,29 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          const Text(
-            'System Overview',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          // Overview Title
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'System Statistics',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Chip(
+                visualDensity: VisualDensity.compact,
+                backgroundColor: Colors.blue.shade50,
+                side: BorderSide(color: Colors.blue.shade200),
+                avatar: const Icon(Icons.verified, size: 16, color: Color(0xFF1E3A8A)),
+                label: const Text(
+                  'SOLID Architecture',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A)),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
 
+          // Stats Grid
           LayoutBuilder(
             builder: (context, constraints) {
               final isSmallMobile = constraints.maxWidth < 360;
@@ -155,6 +185,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
+          // Department Breakdown
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -182,7 +213,7 @@ class DashboardScreen extends StatelessWidget {
                         return Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                            color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
@@ -219,6 +250,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
+          // Recent Students List
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -229,7 +261,7 @@ class DashboardScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Recent Students',
+                        'Recent Student Registrations',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       TextButton(
@@ -239,16 +271,18 @@ class DashboardScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  if (repository.students.isEmpty)
+                  if (studentRepo.getAllStudents().isEmpty)
                     const Text('No students registered')
                   else
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: repository.students.length > 3 ? 3 : repository.students.length,
+                      itemCount: studentRepo.getAllStudents().length > 3
+                          ? 3
+                          : studentRepo.getAllStudents().length,
                       separatorBuilder: (ctx, i) => const Divider(),
                       itemBuilder: (ctx, i) {
-                        final s = repository.students[i];
+                        final s = studentRepo.getAllStudents()[i];
                         final coursesCount = s.enrolledCourseIds.length;
                         return ListTile(
                           contentPadding: EdgeInsets.zero,

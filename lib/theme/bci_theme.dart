@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 class BCITheme {
-  static const Color primaryColor = Color(0xFF1E3A8A); 
-  static const Color secondaryColor = Color(0xFF0D9488); 
-  static const Color accentColor = Color(0xFF3B82F6); 
-  static const Color backgroundColor = Color(0xFFF8FAFC); 
+  static const Color primaryColor = Color(0xFF1E3A8A); // BCI Navy Blue
+  static const Color secondaryColor = Color(0xFF0D9488); // BCI Teal Accent
+  static const Color accentColor = Color(0xFF3B82F6); // BCI Electric Blue
+  static const Color backgroundColor = Color(0xFFF1F5F9); // Slate light grey background
   static const Color surfaceColor = Colors.white;
+  static const Color textPrimaryColor = Color(0xFF0F172A);
 
   static ThemeData get lightTheme {
     final colorScheme = ColorScheme.fromSeed(
@@ -21,24 +22,25 @@ class BCITheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: backgroundColor,
       fontFamily: 'Roboto',
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
-        centerTitle: true,
-        titleTextStyle: const TextStyle(
-          fontSize: 20,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          fontSize: 19,
           fontWeight: FontWeight.bold,
           color: Colors.white,
-          letterSpacing: 0.5,
+          letterSpacing: 0.3,
         ),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
+        color: surfaceColor,
         elevation: 2,
-        shadowColor: Colors.black.withValues(alpha: 0.08),
+        shadowColor: Colors.black.withValues(alpha: 0.06),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -51,7 +53,7 @@ class BCITheme {
             borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(
-            fontSize: 15,
+            fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -60,12 +62,12 @@ class BCITheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: primaryColor,
           side: const BorderSide(color: primaryColor, width: 1.5),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(
-            fontSize: 15,
+            fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -98,6 +100,10 @@ class BCITheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
+      ),
+      chipTheme: ChipThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        elevation: 0,
       ),
     );
   }

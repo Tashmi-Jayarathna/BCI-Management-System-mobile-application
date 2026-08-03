@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/course_model.dart';
 import '../services/bci_repository.dart';
+import '../core/di/app_dependency_provider.dart';
 import '../widgets/course_dialog.dart';
 import '../widgets/course_detail_dialog.dart';
 
@@ -113,11 +114,16 @@ class _CoursesScreenState extends State<CoursesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredCourses = widget.repository.searchCourses(
+    // Open/Closed & Dependency Inversion: Perform course filtering via DIP strategy provider
+    final deps = AppDependencyProvider.of(context);
+    final allCourses = deps.courseRepository.getAllCourses();
+    final filteredCourses = deps.courseSearchStrategy.filter(
+      allCourses,
       _searchController.text,
       _selectedDeptFilter,
     );
 
+    final availableDepts = deps.courseRepository.availableDepartments;
     final isNarrow = MediaQuery.of(context).size.width < 450;
 
     return Scaffold(
@@ -163,7 +169,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                     value: _selectedDeptFilter,
                     isExpanded: true,
                     icon: const Icon(Icons.filter_list),
-                    items: widget.repository.availableDepartments.map((dept) {
+                    items: availableDepts.map((dept) {
                       return DropdownMenuItem(
                         value: dept,
                         child: Text(dept == 'All' ? 'All Departments' : dept),
@@ -210,7 +216,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                       child: DropdownButton<String>(
                         value: _selectedDeptFilter,
                         icon: const Icon(Icons.filter_list),
-                        items: widget.repository.availableDepartments.map((dept) {
+                        items: availableDepts.map((dept) {
                           return DropdownMenuItem(
                             value: dept,
                             child: Text(dept == 'All' ? 'All Depts' : dept),
@@ -231,7 +237,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Showing ${filteredCourses.length} of ${widget.repository.totalCourses} Courses',
+                  'Showing ${filteredCourses.length} of ${allCourses.length} Courses',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -267,7 +273,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                       separatorBuilder: (ctx, i) => const SizedBox(height: 10),
                       itemBuilder: (ctx, i) {
                         final course = filteredCourses[i];
-                        final enrolledStudentsCount = widget.repository.getStudentsForCourse(course.id).length;
+                        final enrolledStudentsCount = deps.enrollmentService.getStudentsForCourse(course.id).length;
 
                         return Card(
                           child: InkWell(

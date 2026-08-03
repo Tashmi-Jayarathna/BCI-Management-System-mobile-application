@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/student_model.dart';
+import '../core/di/app_dependency_provider.dart';
 
 class StudentDialog extends StatefulWidget {
   final Student? student;
@@ -66,6 +67,22 @@ class _StudentDialogState extends State<StudentDialog> {
         enrollmentYear: _yearController.text.trim(),
         enrolledCourseIds: widget.student?.enrolledCourseIds ?? [],
       );
+
+      // Single Responsibility & Dependency Inversion: Delegate domain validation to StudentValidator
+      final validator = AppDependencyProvider.of(context).studentValidator;
+      final validationResult = validator.validate(student);
+
+      if (!validationResult.isValid) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(validationResult.errors.join('\n')),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
       widget.onSave(student);
       Navigator.of(context).pop();
     }
@@ -75,7 +92,6 @@ class _StudentDialogState extends State<StudentDialog> {
   Widget build(BuildContext context) {
     final isEditing = widget.student != null;
     final validDepts = widget.departments.where((d) => d != 'All').toList();
-
     final screenWidth = MediaQuery.of(context).size.width;
 
     return AlertDialog(

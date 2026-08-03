@@ -1,258 +1,125 @@
 import 'package:flutter/foundation.dart';
 import '../models/student_model.dart';
 import '../models/course_model.dart';
+import 'interfaces/student_repository_interface.dart';
+import 'interfaces/course_repository_interface.dart';
+import 'interfaces/enrollment_service_interface.dart';
+import 'interfaces/dashboard_analytics_service_interface.dart';
+import 'implementations/in_memory_student_repository.dart';
+import 'implementations/in_memory_course_repository.dart';
+import 'implementations/enrollment_service.dart';
+import 'implementations/dashboard_analytics_service.dart';
+import 'strategies/search_filter_strategy.dart';
 
+/// Facade Pattern & Backward Compatibility Layer:
+/// Implements ChangeNotifier and delegates all responsibilities to focused SOLID services
+/// (IStudentRepository, ICourseRepository, IEnrollmentService, IDashboardAnalyticsService).
 class BCIRepository extends ChangeNotifier {
-  final List<Student> _students = [];
-  final List<Course> _courses = [];
+  late final IStudentRepository _studentRepo;
+  late final ICourseRepository _courseRepo;
+  late final IEnrollmentService _enrollmentService;
+  late final IDashboardAnalyticsService _analyticsService;
 
-  BCIRepository() {
-    _seedInitialData();
+  final StudentSearchStrategy _studentSearchStrategy = StudentSearchStrategy();
+  final CourseSearchStrategy _courseSearchStrategy = CourseSearchStrategy();
+
+  BCIRepository({
+    IStudentRepository? studentRepo,
+    ICourseRepository? courseRepo,
+    IEnrollmentService? enrollmentService,
+  }) {
+    _studentRepo = studentRepo ?? InMemoryStudentRepository();
+    _courseRepo = courseRepo ?? InMemoryCourseRepository();
+    _enrollmentService = enrollmentService ??
+        EnrollmentService(studentRepo: _studentRepo, courseRepo: _courseRepo);
+    _analyticsService = DashboardAnalyticsService(
+      studentRepo: _studentRepo,
+      courseRepo: _courseRepo,
+      enrollmentService: _enrollmentService,
+    );
   }
 
-  List<Student> get students => List.unmodifiable(_students);
-  List<Course> get courses => List.unmodifiable(_courses);
+  // Accessors for underlying services
+  IStudentRepository get studentRepository => _studentRepo;
+  ICourseRepository get courseRepository => _courseRepo;
+  IEnrollmentService get enrollmentService => _enrollmentService;
+  IDashboardAnalyticsService get analyticsService => _analyticsService;
 
-  int get totalStudents => _students.length;
-  int get totalCourses => _courses.length;
-  int get totalEnrollments =>
-      _students.fold(0, (sum, s) => sum + s.enrolledCourseIds.length);
+  // Delegated Properties
+  List<Student> get students => _studentRepo.getAllStudents();
+  List<Course> get courses => _courseRepo.getAllCourses();
 
-  List<String> get availableDepartments => [
-        'All',
-        'Computer Science',
-        'Business Administration',
-        'Information Technology',
-        'Data Science',
-        'Software Engineering',
-      ];
+  int get totalStudents => _analyticsService.totalStudents;
+  int get totalCourses => _analyticsService.totalCourses;
+  int get totalEnrollments => _analyticsService.totalEnrollments;
 
-  // Seed Data
-  void _seedInitialData() {
-    _courses.addAll([
-      Course(
-        id: 'c1',
-        courseCode: 'CS101',
-        title: 'Introduction to Computer Science',
-        credits: 4,
-        department: 'Computer Science',
-        instructor: 'Dr. Waruna',
-        description: 'Foundations of computing, algorithms, and logic.',
-      ),
-      Course(
-        id: 'c2',
-        courseCode: 'BUS201',
-        title: 'Principles of Management',
-        credits: 3,
-        department: 'Business Administration',
-        instructor: 'Prof. Sujith',
-        description: 'Core concepts in modern enterprise management.',
-      ),
-      Course(
-        id: 'c3',
-        courseCode: 'DS301',
-        title: 'Data Structures & Algorithms',
-        credits: 4,
-        department: 'Data Science',
-        instructor: 'Prof.Thushari',
-        description: 'Advanced trees, graphs, sorting, and dynamic programming.',
-      ),
-      Course(
-        id: 'c4',
-        courseCode: 'SE401',
-        title: 'Mobile App Architecture',
-        credits: 3,
-        department: 'Software Engineering',
-        instructor: 'Dr.Susara',
-        description: 'Cross-platform mobile design patterns and state management.',
-      ),
-      Course(
-        id: 'c5',
-        courseCode: 'IT105',
-        title: 'Cybersecurity Fundamentals',
-        credits: 3,
-        department: 'Information Technology',
-        instructor: 'Mr.Sohan',
-        description: 'Network security, encryption, and threat vectors.',
-      ),
-    ]);
+  List<String> get availableDepartments => _studentRepo.availableDepartments;
 
-    _students.addAll([
-      Student(
-        id: 's1',
-        studentId: 'BCI-2024-001',
-        name: 'Hasanthi Sandeepani',
-        email: 'Hasanthisandeepani@bci.edu',
-        phone: '+1 (555) 234-5678',
-        department: 'Computer Science',
-        enrollmentYear: '2024',
-        enrolledCourseIds: ['c1', 'c3', 'c4'],
-      ),
-      Student(
-        id: 's2',
-        studentId: 'BCI-2024-002',
-        name: 'Senal Navod',
-        email: 'senalnavod@bci.edu',
-        phone: '+1 (555) 876-5432',
-        department: 'Business Administration',
-        enrollmentYear: '2024',
-        enrolledCourseIds: ['c2'],
-      ),
-      Student(
-        id: 's3',
-        studentId: 'BCI-2025-003',
-        name: 'Tharindu Dilshan',
-        email: 'Tharindudilshan@bci.edu',
-        phone: '+1 (555) 345-6789',
-        department: 'Software Engineering',
-        enrollmentYear: '2025',
-        enrolledCourseIds: ['c1', 'c4'],
-      ),
-      Student(
-        id: 's4',
-        studentId: 'BCI-2025-004',
-        name: 'Kavindu Hasinsa',
-        email: 'Kavinduhasinsa@bci.edu',
-        phone: '+1 (555) 987-6543',
-        department: 'Data Science',
-        enrollmentYear: '2025',
-        enrolledCourseIds: ['c3', 'c5'],
-      ),
-    ]);
-  }
+  // Delegated Operations
+  Student? getStudentById(String id) => _studentRepo.getStudentById(id);
+  Course? getCourseById(String id) => _courseRepo.getCourseById(id);
 
-  Student? getStudentById(String id) {
-    try {
-      return _students.firstWhere((s) => s.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
+  List<Course> getCoursesForStudent(String studentId) =>
+      _enrollmentService.getCoursesForStudent(studentId);
 
-  Course? getCourseById(String id) {
-    try {
-      return _courses.firstWhere((c) => c.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  List<Course> getCoursesForStudent(String studentId) {
-    final student = getStudentById(studentId);
-    if (student == null) return [];
-    return _courses.where((c) => student.enrolledCourseIds.contains(c.id)).toList();
-  }
-
-  List<Student> getStudentsForCourse(String courseId) {
-    return _students.where((s) => s.enrolledCourseIds.contains(courseId)).toList();
-  }
+  List<Student> getStudentsForCourse(String courseId) =>
+      _enrollmentService.getStudentsForCourse(courseId);
 
   void addStudent(Student student) {
-    _students.add(student);
+    _studentRepo.addStudent(student);
     notifyListeners();
   }
 
   void updateStudent(Student updatedStudent) {
-    final index = _students.indexWhere((s) => s.id == updatedStudent.id);
-    if (index != -1) {
-      _students[index] = updatedStudent;
-      notifyListeners();
-    }
+    _studentRepo.updateStudent(updatedStudent);
+    notifyListeners();
   }
 
   void deleteStudent(String studentId) {
-    _students.removeWhere((s) => s.id == studentId);
+    _studentRepo.deleteStudent(studentId);
     notifyListeners();
   }
 
   void addCourse(Course course) {
-    _courses.add(course);
+    _courseRepo.addCourse(course);
     notifyListeners();
   }
 
   void updateCourse(Course updatedCourse) {
-    final index = _courses.indexWhere((c) => c.id == updatedCourse.id);
-    if (index != -1) {
-      _courses[index] = updatedCourse;
-      notifyListeners();
-    }
+    _courseRepo.updateCourse(updatedCourse);
+    notifyListeners();
   }
 
   void deleteCourse(String courseId) {
-    _courses.removeWhere((c) => c.id == courseId);
-    for (var i = 0; i < _students.length; i++) {
-      if (_students[i].enrolledCourseIds.contains(courseId)) {
-        final updatedList = List<String>.from(_students[i].enrolledCourseIds)
-          ..remove(courseId);
-        _students[i] = _students[i].copyWith(enrolledCourseIds: updatedList);
-      }
-    }
+    _courseRepo.deleteCourse(courseId);
+    _enrollmentService.handleCourseDeleted(courseId);
     notifyListeners();
   }
 
   void enrolStudentInCourse(String studentId, String courseId) {
-    final index = _students.indexWhere((s) => s.id == studentId);
-    if (index != -1) {
-      final student = _students[index];
-      if (!student.enrolledCourseIds.contains(courseId)) {
-        final updatedList = List<String>.from(student.enrolledCourseIds)..add(courseId);
-        _students[index] = student.copyWith(enrolledCourseIds: updatedList);
-        notifyListeners();
-      }
-    }
+    _enrollmentService.enrolStudentInCourse(studentId, courseId);
+    notifyListeners();
   }
 
   void unEnrolStudentFromCourse(String studentId, String courseId) {
-    final index = _students.indexWhere((s) => s.id == studentId);
-    if (index != -1) {
-      final student = _students[index];
-      if (student.enrolledCourseIds.contains(courseId)) {
-        final updatedList = List<String>.from(student.enrolledCourseIds)..remove(courseId);
-        _students[index] = student.copyWith(enrolledCourseIds: updatedList);
-        notifyListeners();
-      }
-    }
+    _enrollmentService.unEnrolStudentFromCourse(studentId, courseId);
+    notifyListeners();
   }
 
   void updateStudentEnrollments(String studentId, List<String> courseIds) {
-    final index = _students.indexWhere((s) => s.id == studentId);
-    if (index != -1) {
-      _students[index] = _students[index].copyWith(enrolledCourseIds: courseIds);
-      notifyListeners();
-    }
+    _enrollmentService.updateStudentEnrollments(studentId, courseIds);
+    notifyListeners();
   }
 
   List<Student> searchStudents(String query, String departmentFilter) {
-    return _students.where((s) {
-      final matchesQuery = query.isEmpty ||
-          s.name.toLowerCase().contains(query.toLowerCase()) ||
-          s.studentId.toLowerCase().contains(query.toLowerCase()) ||
-          s.email.toLowerCase().contains(query.toLowerCase());
-      final matchesDept = departmentFilter.isEmpty ||
-          departmentFilter == 'All' ||
-          s.department == departmentFilter;
-      return matchesQuery && matchesDept;
-    }).toList();
+    return _studentSearchStrategy.filter(_studentRepo.getAllStudents(), query, departmentFilter);
   }
 
   List<Course> searchCourses(String query, String departmentFilter) {
-    return _courses.where((c) {
-      final matchesQuery = query.isEmpty ||
-          c.title.toLowerCase().contains(query.toLowerCase()) ||
-          c.courseCode.toLowerCase().contains(query.toLowerCase()) ||
-          c.instructor.toLowerCase().contains(query.toLowerCase());
-      final matchesDept = departmentFilter.isEmpty ||
-          departmentFilter == 'All' ||
-          c.department == departmentFilter;
-      return matchesQuery && matchesDept;
-    }).toList();
+    return _courseSearchStrategy.filter(_courseRepo.getAllCourses(), query, departmentFilter);
   }
 
   Map<String, int> getDepartmentStudentCount() {
-    final Map<String, int> counts = {};
-    for (var s in _students) {
-      counts[s.department] = (counts[s.department] ?? 0) + 1;
-    }
-    return counts;
+    return _analyticsService.getDepartmentStudentDistribution();
   }
 }

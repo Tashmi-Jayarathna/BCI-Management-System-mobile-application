@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/student_model.dart';
 import '../models/course_model.dart';
 import '../services/bci_repository.dart';
+import '../core/di/app_dependency_provider.dart';
 
 class EnrollmentScreen extends StatefulWidget {
   final BCIRepository repository;
@@ -42,6 +43,9 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (modalCtx, setModalState) {
+            final deps = AppDependencyProvider.of(context);
+            final allCourses = deps.courseRepository.getAllCourses();
+
             return Container(
               height: MediaQuery.of(context).size.height * 0.75,
               padding: const EdgeInsets.all(20),
@@ -88,7 +92,7 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Available Courses (${widget.repository.courses.length})',
+                        'Available Courses (${allCourses.length})',
                         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                       ),
                       Text(
@@ -102,13 +106,13 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                   ),
                   const SizedBox(height: 10),
                   Expanded(
-                    child: widget.repository.courses.isEmpty
+                    child: allCourses.isEmpty
                         ? const Center(child: Text('No courses available in the system'))
                         : ListView.separated(
-                            itemCount: widget.repository.courses.length,
+                            itemCount: allCourses.length,
                             separatorBuilder: (c, i) => const SizedBox(height: 8),
                             itemBuilder: (c, i) {
-                              final course = widget.repository.courses[i];
+                              final course = allCourses[i];
                               final isEnrolled = enrolledIds.contains(course.id);
 
                               return Card(
@@ -182,18 +186,22 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final students = widget.repository.students;
+    // Single Responsibility & Dependency Inversion: Read state via DIP services
+    final deps = AppDependencyProvider.of(context);
+    final studentRepo = deps.studentRepository;
+    final enrollmentService = deps.enrollmentService;
+    final students = studentRepo.getAllStudents();
 
     if (_selectedStudentId != null && !students.any((s) => s.id == _selectedStudentId)) {
       _selectedStudentId = students.isNotEmpty ? students.first.id : null;
     }
 
     final selectedStudent = _selectedStudentId != null
-        ? widget.repository.getStudentById(_selectedStudentId!)
+        ? studentRepo.getStudentById(_selectedStudentId!)
         : null;
 
     final enrolledCourses = selectedStudent != null
-        ? widget.repository.getCoursesForStudent(selectedStudent.id)
+        ? enrollmentService.getCoursesForStudent(selectedStudent.id)
         : <Course>[];
 
     return Scaffold(

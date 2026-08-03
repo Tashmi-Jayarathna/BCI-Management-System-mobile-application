@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'theme/bci_theme.dart';
 import 'services/bci_repository.dart';
+import 'core/di/app_dependency_provider.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/students_screen.dart';
 import 'screens/courses_screen.dart';
@@ -10,22 +11,47 @@ void main() {
   runApp(const BCIManagementApp());
 }
 
-class BCIManagementApp extends StatelessWidget {
+class BCIManagementApp extends StatefulWidget {
   const BCIManagementApp({super.key});
 
   @override
+  State<BCIManagementApp> createState() => _BCIManagementAppState();
+}
+
+class _BCIManagementAppState extends State<BCIManagementApp> {
+  late final BCIRepository _repository;
+  late final AppDependencies _appDependencies;
+
+  @override
+  void initState() {
+    super.initState();
+    _repository = BCIRepository();
+    _appDependencies = AppDependencies(
+      studentRepository: _repository.studentRepository,
+      courseRepository: _repository.courseRepository,
+      enrollmentService: _repository.enrollmentService,
+      analyticsService: _repository.analyticsService,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BCI Management System',
-      debugShowCheckedModeBanner: false,
-      theme: BCITheme.lightTheme,
-      home: const MainNavigationScreen(),
+    return AppDependencyProvider(
+      dependencies: _appDependencies,
+      child: MaterialApp(
+        title: 'BCI Management System',
+        debugShowCheckedModeBanner: false,
+        theme: BCITheme.lightTheme,
+        home: MainNavigationScreen(repository: _repository),
+      ),
     );
   }
 }
 
 class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+  final BCIRepository repository;
+
+  const MainNavigationScreen({super.key, required this.repository});
 
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
@@ -33,19 +59,17 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
-  late final BCIRepository _repository;
 
   @override
   void initState() {
     super.initState();
-    _repository = BCIRepository();
-    _repository.addListener(_onRepositoryChanged);
+    widget.repository.addListener(_onRepositoryChanged);
   }
 
   @override
   void dispose() {
-    _repository.removeListener(_onRepositoryChanged);
-    _repository.dispose();
+    widget.repository.removeListener(_onRepositoryChanged);
+    widget.repository.dispose();
     super.dispose();
   }
 
@@ -63,12 +87,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     final List<Widget> screens = [
       DashboardScreen(
-        repository: _repository,
+        repository: widget.repository,
         onNavigateToTab: _onTabSelected,
       ),
-      StudentsScreen(repository: _repository),
-      CoursesScreen(repository: _repository),
-      EnrollmentScreen(repository: _repository),
+      StudentsScreen(repository: widget.repository),
+      CoursesScreen(repository: widget.repository),
+      EnrollmentScreen(repository: widget.repository),
     ];
 
     final titles = [
@@ -85,7 +109,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           children: [
             const Icon(Icons.school, size: 26),
             const SizedBox(width: 10),
-            Text(titles[_currentIndex]),
+            Flexible(
+              child: Text(
+                titles[_currentIndex],
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         actions: [
@@ -96,15 +125,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               showAboutDialog(
                 context: context,
                 applicationName: 'BCI Management System',
-                applicationVersion: '1.0.0',
+                applicationVersion: '2.0.0 (SOLID Refactored)',
                 applicationIcon: const Icon(Icons.school, size: 48, color: Color(0xFF1E3A8A)),
                 children: [
                   const SizedBox(height: 12),
-                  const Text('Comprehensive Mobile Academic Management System for Benedict XVI Catholic International Institute of Higher Education, (BCI).'),
+                  const Text('Comprehensive Academic Management System for Benedict XVI Catholic International Institute of Higher Education (BCI).'),
                   const SizedBox(height: 8),
-                  Text('Total Students: ${_repository.totalStudents}'),
-                  Text('Total Courses: ${_repository.totalCourses}'),
-                  Text('Total Enrollments: ${_repository.totalEnrollments}'),
+                  const Text('Architecture: Built with SOLID Principles (SRP, OCP, LSP, ISP, DIP).'),
+                  const SizedBox(height: 8),
+                  Text('Total Students: ${widget.repository.totalStudents}'),
+                  Text('Total Courses: ${widget.repository.totalCourses}'),
+                  Text('Total Enrollments: ${widget.repository.totalEnrollments}'),
                 ],
               );
             },
@@ -122,9 +153,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 8,
-              offset: const Offset(0, -2),
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 10,
+              offset: const Offset(0, -3),
             ),
           ],
         ),
