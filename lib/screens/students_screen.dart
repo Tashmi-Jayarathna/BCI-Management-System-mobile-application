@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import '../models/student_model.dart';
-import '../services/bci_repository.dart';
 import '../core/di/app_dependency_provider.dart';
 import '../widgets/student_dialog.dart';
 import '../widgets/student_detail_dialog.dart';
 
 class StudentsScreen extends StatefulWidget {
-  final BCIRepository repository;
-
-  const StudentsScreen({super.key, required this.repository});
+  const StudentsScreen({super.key});
 
   @override
   State<StudentsScreen> createState() => _StudentsScreenState();
@@ -25,12 +22,15 @@ class _StudentsScreenState extends State<StudentsScreen> {
   }
 
   void _openAddStudentDialog() {
+    final deps = AppDependencyProvider.of(context);
+
     showDialog(
       context: context,
       builder: (ctx) => StudentDialog(
-        departments: widget.repository.availableDepartments,
+        departments: deps.studentRepository.availableDepartments,
         onSave: (newStudent) {
-          widget.repository.addStudent(newStudent);
+          deps.managementService.addStudent(newStudent);
+          setState(() {});
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Student "${newStudent.name}" added successfully!'),
@@ -44,13 +44,16 @@ class _StudentsScreenState extends State<StudentsScreen> {
   }
 
   void _openEditStudentDialog(Student student) {
+    final deps = AppDependencyProvider.of(context);
+
     showDialog(
       context: context,
       builder: (ctx) => StudentDialog(
         student: student,
-        departments: widget.repository.availableDepartments,
+        departments: deps.studentRepository.availableDepartments,
         onSave: (updatedStudent) {
-          widget.repository.updateStudent(updatedStudent);
+          deps.managementService.updateStudent(updatedStudent);
+          setState(() {});
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Student "${updatedStudent.name}" updated successfully!'),
@@ -68,13 +71,14 @@ class _StudentsScreenState extends State<StudentsScreen> {
       context: context,
       builder: (ctx) => StudentDetailDialog(
         student: student,
-        repository: widget.repository,
         onEdit: () => _openEditStudentDialog(student),
       ),
     );
   }
 
   void _confirmDeleteStudent(Student student) {
+    final deps = AppDependencyProvider.of(context);
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -95,7 +99,8 @@ class _StudentsScreenState extends State<StudentsScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
-              widget.repository.deleteStudent(student.id);
+              deps.managementService.deleteStudent(student.id);
+              setState(() {});
               Navigator.of(ctx).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

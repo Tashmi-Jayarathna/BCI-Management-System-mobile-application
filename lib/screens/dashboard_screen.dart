@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import '../services/bci_repository.dart';
 import '../core/di/app_dependency_provider.dart';
 
 class DashboardScreen extends StatelessWidget {
-  final BCIRepository repository;
   final Function(int tabIndex) onNavigateToTab;
 
   const DashboardScreen({
     super.key,
-    required this.repository,
     required this.onNavigateToTab,
   });
 

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/student_model.dart';
 import '../models/course_model.dart';
+import 'interfaces/management_service_interface.dart';
 import 'interfaces/student_repository_interface.dart';
 import 'interfaces/course_repository_interface.dart';
 import 'interfaces/enrollment_service_interface.dart';
@@ -14,7 +15,7 @@ import 'strategies/search_filter_strategy.dart';
 /// Facade Pattern & Backward Compatibility Layer:
 /// Implements ChangeNotifier and delegates all responsibilities to focused SOLID services
 /// (IStudentRepository, ICourseRepository, IEnrollmentService, IDashboardAnalyticsService).
-class BCIRepository extends ChangeNotifier {
+class BCIRepository extends ChangeNotifier implements IManagementService {
   late final IStudentRepository _studentRepo;
   late final ICourseRepository _courseRepo;
   late final IEnrollmentService _enrollmentService;

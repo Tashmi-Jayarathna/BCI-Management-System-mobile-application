@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/interfaces/management_service_interface.dart';
 import '../../services/interfaces/student_repository_interface.dart';
 import '../../services/interfaces/course_repository_interface.dart';
 import '../../services/interfaces/enrollment_service_interface.dart';
@@ -13,6 +14,7 @@ class AppDependencies {
   final ICourseRepository courseRepository;
   final IEnrollmentService enrollmentService;
   final IDashboardAnalyticsService analyticsService;
+  final IManagementService managementService;
 
   final StudentValidator studentValidator = StudentValidator();
   final CourseValidator courseValidator = CourseValidator();
@@ -24,6 +26,7 @@ class AppDependencies {
     required this.courseRepository,
     required this.enrollmentService,
     required this.analyticsService,
+    required this.managementService,
   });
 }
 

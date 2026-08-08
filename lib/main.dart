@@ -31,6 +31,7 @@ class _BCIManagementAppState extends State<BCIManagementApp> {
       courseRepository: _repository.courseRepository,
       enrollmentService: _repository.enrollmentService,
       analyticsService: _repository.analyticsService,
+      managementService: _repository,
     );
   }
 
@@ -86,13 +87,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
-      DashboardScreen(
-        repository: widget.repository,
-        onNavigateToTab: _onTabSelected,
-      ),
-      StudentsScreen(repository: widget.repository),
-      CoursesScreen(repository: widget.repository),
-      EnrollmentScreen(repository: widget.repository),
+      DashboardScreen(onNavigateToTab: _onTabSelected),
+      const StudentsScreen(),
+      const CoursesScreen(),
+      const EnrollmentScreen(),
     ];
 
     final titles = [

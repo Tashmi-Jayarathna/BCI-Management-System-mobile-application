@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import '../models/course_model.dart';
-import '../services/bci_repository.dart';
+import '../core/di/app_dependency_provider.dart';
 
 class CourseDetailDialog extends StatelessWidget {
   final Course course;
-  final BCIRepository repository;
   final VoidCallback onEdit;
 
   const CourseDetailDialog({
     super.key,
     required this.course,
-    required this.repository,
     required this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
-    final currentCourse = repository.getCourseById(course.id) ?? course;
-    final enrolledStudents = repository.getStudentsForCourse(currentCourse.id);
+    final deps = AppDependencyProvider.of(context);
+    final currentCourse = deps.courseRepository.getCourseById(course.id) ?? course;
+    final enrolledStudents = deps.enrollmentService.getStudentsForCourse(currentCourse.id);
 
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -169,7 +168,8 @@ class CourseDetailDialog extends StatelessWidget {
                               icon: const Icon(Icons.person_remove_outlined, color: Colors.redAccent),
                               tooltip: 'Remove from course',
                               onPressed: () {
-                                repository.unEnrolStudentFromCourse(student.id, currentCourse.id);
+                                final deps = AppDependencyProvider.of(context);
+                                deps.managementService.unEnrolStudentFromCourse(student.id, currentCourse.id);
                                 (context as Element).markNeedsBuild();
                               },
                             ),

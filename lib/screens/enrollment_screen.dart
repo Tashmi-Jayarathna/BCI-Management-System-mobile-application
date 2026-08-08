@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/student_model.dart';
 import '../models/course_model.dart';
-import '../services/bci_repository.dart';
 import '../core/di/app_dependency_provider.dart';
 
 class EnrollmentScreen extends StatefulWidget {
-  final BCIRepository repository;
-
-  const EnrollmentScreen({super.key, required this.repository});
+  const EnrollmentScreen({super.key});
 
   @override
   State<EnrollmentScreen> createState() => _EnrollmentScreenState();
@@ -16,14 +13,6 @@ class EnrollmentScreen extends StatefulWidget {
 class _EnrollmentScreenState extends State<EnrollmentScreen> {
   String? _selectedStudentId;
   final TextEditingController _studentSearchController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.repository.students.isNotEmpty) {
-      _selectedStudentId = widget.repository.students.first.id;
-    }
-  }
 
   @override
   void dispose() {
@@ -159,7 +148,8 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            widget.repository.updateStudentEnrollments(student.id, enrolledIds);
+                            final deps = AppDependencyProvider.of(context);
+                            deps.managementService.updateStudentEnrollments(student.id, enrolledIds);
                             Navigator.of(ctx).pop();
                             setState(() {});
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -191,6 +181,8 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
     final studentRepo = deps.studentRepository;
     final enrollmentService = deps.enrollmentService;
     final students = studentRepo.getAllStudents();
+
+    _selectedStudentId ??= students.isNotEmpty ? students.first.id : null;
 
     if (_selectedStudentId != null && !students.any((s) => s.id == _selectedStudentId)) {
       _selectedStudentId = students.isNotEmpty ? students.first.id : null;
@@ -346,7 +338,7 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                                 icon: const Icon(Icons.remove_circle_outline, size: 18),
                                 label: const Text('Un-enrol'),
                                 onPressed: () {
-                                  widget.repository.unEnrolStudentFromCourse(selectedStudent.id, course.id);
+                                  enrollmentService.unEnrolStudentFromCourse(selectedStudent.id, course.id);
                                   setState(() {});
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(

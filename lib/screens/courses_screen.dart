@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import '../models/course_model.dart';
-import '../services/bci_repository.dart';
 import '../core/di/app_dependency_provider.dart';
 import '../widgets/course_dialog.dart';
 import '../widgets/course_detail_dialog.dart';
 
 class CoursesScreen extends StatefulWidget {
-  final BCIRepository repository;
-
-  const CoursesScreen({super.key, required this.repository});
+  const CoursesScreen({super.key});
 
   @override
   State<CoursesScreen> createState() => _CoursesScreenState();
@@ -25,12 +22,15 @@ class _CoursesScreenState extends State<CoursesScreen> {
   }
 
   void _openAddCourseDialog() {
+    final deps = AppDependencyProvider.of(context);
+
     showDialog(
       context: context,
       builder: (ctx) => CourseDialog(
-        departments: widget.repository.availableDepartments,
+        departments: deps.courseRepository.availableDepartments,
         onSave: (newCourse) {
-          widget.repository.addCourse(newCourse);
+          deps.managementService.addCourse(newCourse);
+          setState(() {});
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Course "${newCourse.title}" added successfully!'),
@@ -44,13 +44,16 @@ class _CoursesScreenState extends State<CoursesScreen> {
   }
 
   void _openEditCourseDialog(Course course) {
+    final deps = AppDependencyProvider.of(context);
+
     showDialog(
       context: context,
       builder: (ctx) => CourseDialog(
         course: course,
-        departments: widget.repository.availableDepartments,
+        departments: deps.courseRepository.availableDepartments,
         onSave: (updatedCourse) {
-          widget.repository.updateCourse(updatedCourse);
+          deps.managementService.updateCourse(updatedCourse);
+          setState(() {});
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Course "${updatedCourse.title}" updated successfully!'),
@@ -68,13 +71,14 @@ class _CoursesScreenState extends State<CoursesScreen> {
       context: context,
       builder: (ctx) => CourseDetailDialog(
         course: course,
-        repository: widget.repository,
         onEdit: () => _openEditCourseDialog(course),
       ),
     );
   }
 
   void _confirmDeleteCourse(Course course) {
+    final deps = AppDependencyProvider.of(context);
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -95,7 +99,8 @@ class _CoursesScreenState extends State<CoursesScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
-              widget.repository.deleteCourse(course.id);
+              deps.managementService.deleteCourse(course.id);
+              setState(() {});
               Navigator.of(ctx).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
