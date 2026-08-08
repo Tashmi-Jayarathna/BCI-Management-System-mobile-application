@@ -66,47 +66,56 @@ class BCIRepository extends ChangeNotifier implements IManagementService {
   List<Student> getStudentsForCourse(String courseId) =>
       _enrollmentService.getStudentsForCourse(courseId);
 
+  @override
   void addStudent(Student student) {
     _studentRepo.addStudent(student);
     notifyListeners();
   }
 
+  @override
   void updateStudent(Student updatedStudent) {
     _studentRepo.updateStudent(updatedStudent);
     notifyListeners();
   }
 
+  @override
   void deleteStudent(String studentId) {
     _studentRepo.deleteStudent(studentId);
     notifyListeners();
   }
 
+  @override
   void addCourse(Course course) {
     _courseRepo.addCourse(course);
     notifyListeners();
   }
 
+  @override
   void updateCourse(Course updatedCourse) {
     _courseRepo.updateCourse(updatedCourse);
     notifyListeners();
   }
 
+  @override
   void deleteCourse(String courseId) {
     _courseRepo.deleteCourse(courseId);
     _enrollmentService.handleCourseDeleted(courseId);
     notifyListeners();
   }
 
+  @override
   void enrolStudentInCourse(String studentId, String courseId) {
     _enrollmentService.enrolStudentInCourse(studentId, courseId);
     notifyListeners();
   }
 
+  @override
   void unEnrolStudentFromCourse(String studentId, String courseId) {
     _enrollmentService.unEnrolStudentFromCourse(studentId, courseId);
     notifyListeners();
   }
 
+  @override
   void updateStudentEnrollments(String studentId, List<String> courseIds) {
     _enrollmentService.updateStudentEnrollments(studentId, courseIds);
     notifyListeners();

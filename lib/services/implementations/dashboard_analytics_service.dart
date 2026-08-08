@@ -10,12 +10,10 @@ class DashboardAnalyticsService implements IDashboardAnalyticsService {
   final IEnrollmentService _enrollmentService;
 
   DashboardAnalyticsService({
-    required IStudentRepository studentRepo,
-    required ICourseRepository courseRepo,
-    required IEnrollmentService enrollmentService,
-  })  : _studentRepo = studentRepo,
-        _courseRepo = courseRepo,
-        _enrollmentService = enrollmentService;
+    required this._studentRepo,
+    required this._courseRepo,
+    required this._enrollmentService,
+  });
 
   @override
   int get totalStudents => _studentRepo.totalStudents;

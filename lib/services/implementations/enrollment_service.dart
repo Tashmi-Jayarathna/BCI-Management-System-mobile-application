@@ -10,10 +10,9 @@ class EnrollmentService implements IEnrollmentService {
   final ICourseRepository _courseRepo;
 
   EnrollmentService({
-    required IStudentRepository studentRepo,
-    required ICourseRepository courseRepo,
-  })  : _studentRepo = studentRepo,
-        _courseRepo = courseRepo;
+    required this._studentRepo,
+    required this._courseRepo,
+  });
 
   @override
   int get totalEnrollments => _studentRepo
