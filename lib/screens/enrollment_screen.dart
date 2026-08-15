@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/student_model.dart';
 import '../models/course_model.dart';
 import '../core/di/app_dependency_provider.dart';
+import '../widgets/common/app_snackbar.dart';
+import '../widgets/common/empty_state.dart';
 
 class EnrollmentScreen extends StatefulWidget {
   const EnrollmentScreen({super.key});
@@ -12,7 +14,8 @@ class EnrollmentScreen extends StatefulWidget {
 
 class _EnrollmentScreenState extends State<EnrollmentScreen> {
   String? _selectedStudentId;
-  final TextEditingController _studentSearchController = TextEditingController();
+  final TextEditingController _studentSearchController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -65,11 +68,17 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                           children: [
                             Text(
                               'Enrol Courses for ${student.name}',
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             Text(
                               'ID: ${student.studentId} • Dept: ${student.department}',
-                              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade600,
+                              ),
                             ),
                           ],
                         ),
@@ -82,7 +91,10 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                     children: [
                       Text(
                         'Available Courses (${allCourses.length})',
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       Text(
                         '${enrolledIds.length} Selected',
@@ -96,16 +108,26 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                   const SizedBox(height: 10),
                   Expanded(
                     child: allCourses.isEmpty
-                        ? const Center(child: Text('No courses available in the system'))
+                        ? const Center(
+                            child: Text('No courses available in the system'),
+                          )
                         : ListView.separated(
                             itemCount: allCourses.length,
-                            separatorBuilder: (c, i) => const SizedBox(height: 8),
+                            separatorBuilder: (c, i) =>
+                                const SizedBox(height: 8),
                             itemBuilder: (c, i) {
                               final course = allCourses[i];
-                              final isEnrolled = enrolledIds.contains(course.id);
+                              final isEnrolled = enrolledIds.contains(
+                                course.id,
+                              );
 
                               return Card(
-                                color: isEnrolled ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3) : null,
+                                color: isEnrolled
+                                    ? Theme.of(context)
+                                          .colorScheme
+                                          .primaryContainer
+                                          .withValues(alpha: 0.3)
+                                    : null,
                                 margin: EdgeInsets.zero,
                                 elevation: isEnrolled ? 2 : 1,
                                 child: CheckboxListTile(
@@ -113,14 +135,18 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                                   title: Text(
                                     '${course.courseCode} - ${course.title}',
                                     style: TextStyle(
-                                      fontWeight: isEnrolled ? FontWeight.bold : FontWeight.w500,
+                                      fontWeight: isEnrolled
+                                          ? FontWeight.bold
+                                          : FontWeight.w500,
                                     ),
                                   ),
                                   subtitle: Text(
                                     '${course.credits} Credits • Instructor: ${course.instructor}',
                                     style: const TextStyle(fontSize: 12),
                                   ),
-                                  activeColor: Theme.of(context).colorScheme.primary,
+                                  activeColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary,
                                   onChanged: (bool? checked) {
                                     setModalState(() {
                                       if (checked == true) {
@@ -149,15 +175,15 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                         child: ElevatedButton(
                           onPressed: () {
                             final deps = AppDependencyProvider.of(context);
-                            deps.managementService.updateStudentEnrollments(student.id, enrolledIds);
+                            deps.managementService.updateStudentEnrollments(
+                              student.id,
+                              enrolledIds,
+                            );
                             Navigator.of(ctx).pop();
                             setState(() {});
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Enrollment updated for ${student.name}!'),
-                                behavior: SnackBarBehavior.floating,
-                                backgroundColor: Colors.green.shade700,
-                              ),
+                            AppSnackBar.success(
+                              context,
+                              'Enrollment updated for ${student.name}!',
                             );
                           },
                           child: const Text('Save Enrollment'),
@@ -184,7 +210,8 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
 
     _selectedStudentId ??= students.isNotEmpty ? students.first.id : null;
 
-    if (_selectedStudentId != null && !students.any((s) => s.id == _selectedStudentId)) {
+    if (_selectedStudentId != null &&
+        !students.any((s) => s.id == _selectedStudentId)) {
       _selectedStudentId = students.isNotEmpty ? students.first.id : null;
     }
 
@@ -211,17 +238,25 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.how_to_reg, color: Theme.of(context).colorScheme.primary),
+                        Icon(
+                          Icons.how_to_reg,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                         const SizedBox(width: 8),
                         const Text(
                           'Select Student for Enrollment',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
                     if (students.isEmpty)
-                      const Text('No students available. Please add students first.')
+                      const Text(
+                        'No students available. Please add students first.',
+                      )
                     else
                       DropdownButtonFormField<String>(
                         initialValue: _selectedStudentId,
@@ -264,19 +299,26 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                           children: [
                             Text(
                               'Enrolled Courses for ${selectedStudent.name}',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
                               'Total Assigned: ${enrolledCourses.length} Courses',
-                              style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey.shade600,
+                              ),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(width: 8),
                       ElevatedButton.icon(
-                        onPressed: () => _showBatchEnrollmentModal(selectedStudent),
+                        onPressed: () =>
+                            _showBatchEnrollmentModal(selectedStudent),
                         icon: const Icon(Icons.edit_calendar),
                         label: const Text('Manage Courses'),
                       ),
@@ -287,23 +329,17 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
               const SizedBox(height: 12),
               Expanded(
                 child: enrolledCourses.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.school_outlined, size: 56, color: Colors.grey.shade400),
-                            const SizedBox(height: 12),
-                            Text(
-                              'No courses currently assigned to ${selectedStudent.name}.',
-                              style: TextStyle(fontSize: 15, color: Colors.grey.shade600),
-                            ),
-                            const SizedBox(height: 8),
-                            ElevatedButton.icon(
-                              onPressed: () => _showBatchEnrollmentModal(selectedStudent),
-                              icon: const Icon(Icons.add),
-                              label: const Text('Enrol in Courses Now'),
-                            ),
-                          ],
+                    ? EmptyState(
+                        icon: Icons.school_outlined,
+                        iconSize: 56,
+                        titleFontSize: 15,
+                        title:
+                            'No courses currently assigned to ${selectedStudent.name}.',
+                        trailing: ElevatedButton.icon(
+                          onPressed: () =>
+                              _showBatchEnrollmentModal(selectedStudent),
+                          icon: const Icon(Icons.add),
+                          label: const Text('Enrol in Courses Now'),
                         ),
                       )
                     : ListView.separated(
@@ -317,35 +353,49 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
                               leading: Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.secondaryContainer,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondaryContainer,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
                                   course.courseCode,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSecondaryContainer,
                                   ),
                                 ),
                               ),
-                              title: Text(course.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                              subtitle: Text('${course.credits} Credits • Dept: ${course.department} • Instructor: ${course.instructor}'),
+                              title: Text(
+                                course.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(
+                                '${course.credits} Credits • Dept: ${course.department} • Instructor: ${course.instructor}',
+                              ),
                               trailing: OutlinedButton.icon(
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: Colors.red,
                                   side: const BorderSide(color: Colors.red),
                                 ),
-                                icon: const Icon(Icons.remove_circle_outline, size: 18),
+                                icon: const Icon(
+                                  Icons.remove_circle_outline,
+                                  size: 18,
+                                ),
                                 label: const Text('Un-enrol'),
                                 onPressed: () {
-                                  enrollmentService.unEnrolStudentFromCourse(selectedStudent.id, course.id);
+                                  enrollmentService.unEnrolStudentFromCourse(
+                                    selectedStudent.id,
+                                    course.id,
+                                  );
                                   setState(() {});
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Un-enrolled ${selectedStudent.name} from ${course.courseCode}'),
-                                      behavior: SnackBarBehavior.floating,
-                                      backgroundColor: Colors.orange.shade700,
-                                    ),
+                                  AppSnackBar.warning(
+                                    context,
+                                    'Un-enrolled ${selectedStudent.name} from ${course.courseCode}',
                                   );
                                 },
                               ),
@@ -357,7 +407,9 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
             ] else ...[
               const Expanded(
                 child: Center(
-                  child: Text('Please select or add a student to manage course enrollments.'),
+                  child: Text(
+                    'Please select or add a student to manage course enrollments.',
+                  ),
                 ),
               ),
             ],

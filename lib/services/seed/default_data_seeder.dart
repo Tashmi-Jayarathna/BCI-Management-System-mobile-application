@@ -36,7 +36,8 @@ class DefaultDataSeeder implements IDataSeeder {
         credits: 4,
         department: 'Data Science',
         instructor: 'Prof.Thushari',
-        description: 'Advanced trees, graphs, sorting, and dynamic programming.',
+        description:
+            'Advanced trees, graphs, sorting, and dynamic programming.',
       ),
       Course(
         id: 'c4',
@@ -45,7 +46,8 @@ class DefaultDataSeeder implements IDataSeeder {
         credits: 3,
         department: 'Software Engineering',
         instructor: 'Dr.Susara',
-        description: 'Cross-platform mobile design patterns and state management.',
+        description:
+            'Cross-platform mobile design patterns and state management.',
       ),
       Course(
         id: 'c5',

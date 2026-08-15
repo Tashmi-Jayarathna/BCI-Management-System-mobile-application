@@ -31,7 +31,8 @@ class BCIRepository extends ChangeNotifier implements IManagementService {
   }) {
     _studentRepo = studentRepo ?? InMemoryStudentRepository();
     _courseRepo = courseRepo ?? InMemoryCourseRepository();
-    _enrollmentService = enrollmentService ??
+    _enrollmentService =
+        enrollmentService ??
         EnrollmentService(studentRepo: _studentRepo, courseRepo: _courseRepo);
     _analyticsService = DashboardAnalyticsService(
       studentRepo: _studentRepo,
@@ -122,11 +123,19 @@ class BCIRepository extends ChangeNotifier implements IManagementService {
   }
 
   List<Student> searchStudents(String query, String departmentFilter) {
-    return _studentSearchStrategy.filter(_studentRepo.getAllStudents(), query, departmentFilter);
+    return _studentSearchStrategy.filter(
+      _studentRepo.getAllStudents(),
+      query,
+      departmentFilter,
+    );
   }
 
   List<Course> searchCourses(String query, String departmentFilter) {
-    return _courseSearchStrategy.filter(_courseRepo.getAllCourses(), query, departmentFilter);
+    return _courseSearchStrategy.filter(
+      _courseRepo.getAllCourses(),
+      query,
+      departmentFilter,
+    );
   }
 
   Map<String, int> getDepartmentStudentCount() {

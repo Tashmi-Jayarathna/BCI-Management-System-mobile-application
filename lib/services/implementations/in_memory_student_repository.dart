@@ -1,3 +1,4 @@
+import '../../core/constants/departments.dart';
 import '../../models/student_model.dart';
 import '../interfaces/student_repository_interface.dart';
 import '../seed/default_data_seeder.dart';
@@ -7,19 +8,13 @@ class InMemoryStudentRepository implements IStudentRepository {
   final List<Student> _students = [];
 
   InMemoryStudentRepository({IDataSeeder? seeder}) {
-    final initialData = seeder?.seedStudents() ?? DefaultDataSeeder().seedStudents();
+    final initialData =
+        seeder?.seedStudents() ?? DefaultDataSeeder().seedStudents();
     _students.addAll(initialData);
   }
 
   @override
-  List<String> get availableDepartments => [
-        'All',
-        'Computer Science',
-        'Business Administration',
-        'Information Technology',
-        'Data Science',
-        'Software Engineering',
-      ];
+  List<String> get availableDepartments => Departments.values;
 
   @override
   List<Student> getAllStudents() {

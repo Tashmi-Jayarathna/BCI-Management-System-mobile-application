@@ -41,7 +41,8 @@ class AppDependencyProvider extends InheritedWidget {
   });
 
   static AppDependencies of(BuildContext context) {
-    final provider = context.dependOnInheritedWidgetOfExactType<AppDependencyProvider>();
+    final provider = context
+        .dependOnInheritedWidgetOfExactType<AppDependencyProvider>();
     assert(provider != null, 'No AppDependencyProvider found in context');
     return provider!.dependencies;
   }

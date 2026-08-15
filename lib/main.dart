@@ -124,16 +124,26 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 context: context,
                 applicationName: 'BCI Management System',
                 applicationVersion: '2.0.0 (SOLID Refactored)',
-                applicationIcon: const Icon(Icons.school, size: 48, color: Color(0xFF1E3A8A)),
+                applicationIcon: const Icon(
+                  Icons.school,
+                  size: 48,
+                  color: Color(0xFF1E3A8A),
+                ),
                 children: [
                   const SizedBox(height: 12),
-                  const Text('Comprehensive Academic Management System for Benedict XVI Catholic International Institute of Higher Education (BCI).'),
+                  const Text(
+                    'Comprehensive Academic Management System for Benedict XVI Catholic International Institute of Higher Education (BCI).',
+                  ),
                   const SizedBox(height: 8),
-                  const Text('Architecture: Built with SOLID Principles (SRP, OCP, LSP, ISP, DIP).'),
+                  const Text(
+                    'Architecture: Built with SOLID Principles (SRP, OCP, LSP, ISP, DIP).',
+                  ),
                   const SizedBox(height: 8),
                   Text('Total Students: ${widget.repository.totalStudents}'),
                   Text('Total Courses: ${widget.repository.totalCourses}'),
-                  Text('Total Enrollments: ${widget.repository.totalEnrollments}'),
+                  Text(
+                    'Total Enrollments: ${widget.repository.totalEnrollments}',
+                  ),
                 ],
               );
             },
@@ -163,7 +173,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           type: BottomNavigationBarType.fixed,
           selectedItemColor: Theme.of(context).colorScheme.primary,
           unselectedItemColor: Colors.grey.shade600,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
           unselectedLabelStyle: const TextStyle(fontSize: 12),
           elevation: 8,
           items: const [

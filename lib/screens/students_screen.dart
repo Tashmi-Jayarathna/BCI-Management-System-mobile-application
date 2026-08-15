@@ -3,6 +3,11 @@ import '../models/student_model.dart';
 import '../core/di/app_dependency_provider.dart';
 import '../widgets/student_dialog.dart';
 import '../widgets/student_detail_dialog.dart';
+import '../widgets/common/app_snackbar.dart';
+import '../widgets/common/confirm_delete_dialog.dart';
+import '../widgets/common/empty_state.dart';
+import '../widgets/common/entity_list_card.dart';
+import '../widgets/common/search_filter_bar.dart';
 
 class StudentsScreen extends StatefulWidget {
   const StudentsScreen({super.key});
@@ -31,12 +36,9 @@ class _StudentsScreenState extends State<StudentsScreen> {
         onSave: (newStudent) {
           deps.managementService.addStudent(newStudent);
           setState(() {});
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Student "${newStudent.name}" added successfully!'),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.green.shade700,
-            ),
+          AppSnackBar.success(
+            context,
+            'Student "${newStudent.name}" added successfully!',
           );
         },
       ),
@@ -54,12 +56,9 @@ class _StudentsScreenState extends State<StudentsScreen> {
         onSave: (updatedStudent) {
           deps.managementService.updateStudent(updatedStudent);
           setState(() {});
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Student "${updatedStudent.name}" updated successfully!'),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.blue.shade700,
-            ),
+          AppSnackBar.info(
+            context,
+            'Student "${updatedStudent.name}" updated successfully!',
           );
         },
       ),
@@ -79,41 +78,15 @@ class _StudentsScreenState extends State<StudentsScreen> {
   void _confirmDeleteStudent(Student student) {
     final deps = AppDependencyProvider.of(context);
 
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Confirm Deletion'),
-          ],
-        ),
-        content: Text('Are you sure you want to delete student record for "${student.name}" (${student.studentId})?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              deps.managementService.deleteStudent(student.id);
-              setState(() {});
-              Navigator.of(ctx).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Student "${student.name}" deleted.'),
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: Colors.red.shade700,
-                ),
-              );
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+    ConfirmDeleteDialog.show(
+      context,
+      message:
+          'Are you sure you want to delete student record for "${student.name}" (${student.studentId})?',
+      onConfirm: () {
+        deps.managementService.deleteStudent(student.id);
+        setState(() {});
+        AppSnackBar.error(context, 'Student "${student.name}" deleted.');
+      },
     );
   }
 
@@ -129,7 +102,6 @@ class _StudentsScreenState extends State<StudentsScreen> {
     );
 
     final availableDepts = deps.studentRepository.availableDepartments;
-    final isNarrow = MediaQuery.of(context).size.width < 450;
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
@@ -141,101 +113,15 @@ class _StudentsScreenState extends State<StudentsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            if (isNarrow) ...[
-              TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search by name, ID, or email...',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            setState(() {
-                              _searchController.clear();
-                            });
-                          },
-                        )
-                      : null,
-                ),
-                onChanged: (val) => setState(() {}),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFCBD5E1)),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _selectedDeptFilter,
-                    isExpanded: true,
-                    icon: const Icon(Icons.filter_list),
-                    items: availableDepts.map((dept) {
-                      return DropdownMenuItem(
-                        value: dept,
-                        child: Text(dept == 'All' ? 'All Departments' : dept),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      if (val != null) setState(() => _selectedDeptFilter = val);
-                    },
-                  ),
-                ),
-              ),
-            ] else ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search by name, ID, or email...',
-                        prefixIcon: const Icon(Icons.search),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () {
-                                  setState(() {
-                                    _searchController.clear();
-                                  });
-                                },
-                              )
-                            : null,
-                      ),
-                      onChanged: (val) => setState(() {}),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFCBD5E1)),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedDeptFilter,
-                        icon: const Icon(Icons.filter_list),
-                        items: availableDepts.map((dept) {
-                          return DropdownMenuItem(
-                            value: dept,
-                            child: Text(dept == 'All' ? 'All Depts' : dept),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          if (val != null) setState(() => _selectedDeptFilter = val);
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            SearchFilterBar(
+              searchController: _searchController,
+              searchHint: 'Search by name, ID, or email...',
+              onChanged: () => setState(() {}),
+              selectedDepartment: _selectedDeptFilter,
+              departments: availableDepts,
+              onDepartmentChanged: (val) =>
+                  setState(() => _selectedDeptFilter = val),
+            ),
             const SizedBox(height: 16),
 
             Row(
@@ -255,23 +141,11 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
             Expanded(
               child: filteredStudents.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.person_search, size: 64, color: Colors.grey.shade400),
-                          const SizedBox(height: 12),
-                          Text(
-                            'No student records found',
-                            style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Try adjusting your search query or department filter.',
-                            style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
-                          ),
-                        ],
-                      ),
+                  ? const EmptyState(
+                      icon: Icons.person_search,
+                      title: 'No student records found',
+                      subtitle:
+                          'Try adjusting your search query or department filter.',
                     )
                   : ListView.separated(
                       itemCount: filteredStudents.length,
@@ -280,98 +154,38 @@ class _StudentsScreenState extends State<StudentsScreen> {
                         final student = filteredStudents[i];
                         final enrolledCount = student.enrolledCourseIds.length;
 
-                        return Card(
-                          child: InkWell(
-                            onTap: () => _openStudentDetail(student),
-                            borderRadius: BorderRadius.circular(16),
-                            child: Padding(
-                              padding: const EdgeInsets.all(14.0),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 22,
-                                    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                                    child: Text(
-                                      student.name.isNotEmpty ? student.name[0].toUpperCase() : 'S',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          student.name,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          '${student.studentId} • ${student.department}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey.shade700,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          student.email,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.grey.shade500,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Chip(
-                                        padding: EdgeInsets.zero,
-                                        visualDensity: VisualDensity.compact,
-                                        label: Text(
-                                          '$enrolledCount Courses',
-                                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
-                                        ),
-                                        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-                                      ),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                            constraints: const BoxConstraints(),
-                                            padding: const EdgeInsets.all(6),
-                                            icon: const Icon(Icons.edit_outlined, size: 18, color: Colors.blue),
-                                            onPressed: () => _openEditStudentDialog(student),
-                                            tooltip: 'Edit Student',
-                                          ),
-                                          IconButton(
-                                            constraints: const BoxConstraints(),
-                                            padding: const EdgeInsets.all(6),
-                                            icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
-                                            onPressed: () => _confirmDeleteStudent(student),
-                                            tooltip: 'Delete Student',
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                        return EntityListCard(
+                          onTap: () => _openStudentDetail(student),
+                          leading: CircleAvatar(
+                            radius: 22,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primaryContainer,
+                            child: Text(
+                              student.name.isNotEmpty
+                                  ? student.name[0].toUpperCase()
+                                  : 'S',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryContainer,
                               ),
                             ),
                           ),
+                          title: student.name,
+                          subtitleLine1:
+                              '${student.studentId} • ${student.department}',
+                          subtitleLine2: student.email,
+                          badgeLabel: '$enrolledCount Courses',
+                          badgeBackgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.secondaryContainer,
+                          onEdit: () => _openEditStudentDialog(student),
+                          onDelete: () => _confirmDeleteStudent(student),
+                          editTooltip: 'Edit Student',
+                          deleteTooltip: 'Delete Student',
                         );
                       },
                     ),

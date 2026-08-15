@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/course_model.dart';
 import '../core/di/app_dependency_provider.dart';
+import 'common/empty_state.dart';
+import 'common/removable_list_tile_card.dart';
 
 class CourseDetailDialog extends StatelessWidget {
   final Course course;
@@ -15,8 +17,11 @@ class CourseDetailDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deps = AppDependencyProvider.of(context);
-    final currentCourse = deps.courseRepository.getCourseById(course.id) ?? course;
-    final enrolledStudents = deps.enrollmentService.getStudentsForCourse(currentCourse.id);
+    final currentCourse =
+        deps.courseRepository.getCourseById(course.id) ?? course;
+    final enrolledStudents = deps.enrollmentService.getStudentsForCourse(
+      currentCourse.id,
+    );
 
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -34,7 +39,10 @@ class CourseDetailDialog extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(10),
@@ -55,11 +63,17 @@ class CourseDetailDialog extends StatelessWidget {
                     children: [
                       Text(
                         currentCourse.title,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Text(
                         '${currentCourse.department} • ${currentCourse.credits} Credits',
-                        style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ],
                   ),
@@ -95,15 +109,28 @@ class CourseDetailDialog extends StatelessWidget {
                     children: [
                       const Icon(Icons.person, size: 18, color: Colors.teal),
                       const SizedBox(width: 8),
-                      const Text('Instructor: ', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                      Text(currentCourse.instructor, style: const TextStyle(fontSize: 13)),
+                      const Text(
+                        'Instructor: ',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        currentCourse.instructor,
+                        style: const TextStyle(fontSize: 13),
+                      ),
                     ],
                   ),
                   if (currentCourse.description.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(
                       currentCourse.description,
-                      style: TextStyle(fontSize: 13, color: Colors.grey.shade700, height: 1.3),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade700,
+                        height: 1.3,
+                      ),
                     ),
                   ],
                 ],
@@ -117,11 +144,16 @@ class CourseDetailDialog extends StatelessWidget {
               children: [
                 Text(
                   'Enrolled Students (${enrolledStudents.length})',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Chip(
                   label: Text('${enrolledStudents.length} Active'),
-                  backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.secondaryContainer,
                   labelStyle: TextStyle(
                     color: Theme.of(context).colorScheme.onSecondaryContainer,
                     fontSize: 12,
@@ -135,45 +167,39 @@ class CourseDetailDialog extends StatelessWidget {
             // Enrolled students list
             Expanded(
               child: enrolledStudents.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.people_outline, size: 40, color: Colors.grey.shade400),
-                          const SizedBox(height: 8),
-                          Text(
-                            'No students enrolled yet',
-                            style: TextStyle(color: Colors.grey.shade600),
-                          ),
-                        ],
-                      ),
+                  ? const EmptyState(
+                      icon: Icons.people_outline,
+                      iconSize: 40,
+                      iconSpacing: 8,
+                      titleFontSize: 14,
+                      title: 'No students enrolled yet',
                     )
                   : ListView.separated(
                       itemCount: enrolledStudents.length,
                       separatorBuilder: (ctx, i) => const SizedBox(height: 8),
                       itemBuilder: (ctx, i) {
                         final student = enrolledStudents[i];
-                        return Card(
-                          margin: EdgeInsets.zero,
-                          elevation: 1,
-                          child: ListTile(
-                            dense: true,
-                            leading: CircleAvatar(
-                              radius: 16,
-                              child: Text(student.name[0].toUpperCase(), style: const TextStyle(fontSize: 12)),
-                            ),
-                            title: Text(student.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                            subtitle: Text('${student.studentId} • ${student.department}'),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.person_remove_outlined, color: Colors.redAccent),
-                              tooltip: 'Remove from course',
-                              onPressed: () {
-                                final deps = AppDependencyProvider.of(context);
-                                deps.managementService.unEnrolStudentFromCourse(student.id, currentCourse.id);
-                                (context as Element).markNeedsBuild();
-                              },
+                        return RemovableListTileCard(
+                          leading: CircleAvatar(
+                            radius: 16,
+                            child: Text(
+                              student.name[0].toUpperCase(),
+                              style: const TextStyle(fontSize: 12),
                             ),
                           ),
+                          title: student.name,
+                          subtitle:
+                              '${student.studentId} • ${student.department}',
+                          trailingIcon: Icons.person_remove_outlined,
+                          trailingTooltip: 'Remove from course',
+                          onRemove: () {
+                            final deps = AppDependencyProvider.of(context);
+                            deps.managementService.unEnrolStudentFromCourse(
+                              student.id,
+                              currentCourse.id,
+                            );
+                            (context as Element).markNeedsBuild();
+                          },
                         );
                       },
                     ),

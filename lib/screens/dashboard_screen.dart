@@ -4,10 +4,7 @@ import '../core/di/app_dependency_provider.dart';
 class DashboardScreen extends StatelessWidget {
   final Function(int tabIndex) onNavigateToTab;
 
-  const DashboardScreen({
-    super.key,
-    required this.onNavigateToTab,
-  });
+  const DashboardScreen({super.key, required this.onNavigateToTab});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +40,9 @@ class DashboardScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.25),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.25),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -119,10 +118,18 @@ class DashboardScreen extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 backgroundColor: Colors.blue.shade50,
                 side: BorderSide(color: Colors.blue.shade200),
-                avatar: const Icon(Icons.verified, size: 16, color: Color(0xFF1E3A8A)),
+                avatar: const Icon(
+                  Icons.verified,
+                  size: 16,
+                  color: Color(0xFF1E3A8A),
+                ),
                 label: const Text(
                   'SOLID Architecture',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A)),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E3A8A),
+                  ),
                 ),
               ),
             ],
@@ -133,8 +140,12 @@ class DashboardScreen extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               final isSmallMobile = constraints.maxWidth < 360;
-              final crossAxisCount = constraints.maxWidth > 600 ? 4 : (isSmallMobile ? 1 : 2);
-              final aspectRatio = constraints.maxWidth > 600 ? 1.4 : (isSmallMobile ? 2.5 : 1.3);
+              final crossAxisCount = constraints.maxWidth > 600
+                  ? 4
+                  : (isSmallMobile ? 1 : 2);
+              final aspectRatio = constraints.maxWidth > 600
+                  ? 1.4
+                  : (isSmallMobile ? 2.5 : 1.3);
 
               return GridView.count(
                 crossAxisCount: crossAxisCount,
@@ -194,9 +205,15 @@ class DashboardScreen extends StatelessWidget {
                     children: [
                       const Text(
                         'Department Breakdown',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      Icon(Icons.pie_chart_outline, color: Theme.of(context).colorScheme.primary),
+                      Icon(
+                        Icons.pie_chart_outline,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -208,12 +225,20 @@ class DashboardScreen extends StatelessWidget {
                       runSpacing: 10,
                       children: deptStats.entries.map((entry) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primaryContainer
+                                .withValues(alpha: 0.4),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.2),
                             ),
                           ),
                           child: Row(
@@ -221,7 +246,9 @@ class DashboardScreen extends StatelessWidget {
                             children: [
                               CircleAvatar(
                                 radius: 12,
-                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
                                 child: Text(
                                   entry.value.toString(),
                                   style: const TextStyle(
@@ -234,7 +261,10 @@ class DashboardScreen extends StatelessWidget {
                               const SizedBox(width: 8),
                               Text(
                                 entry.key,
-                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
                               ),
                             ],
                           ),
@@ -259,7 +289,10 @@ class DashboardScreen extends StatelessWidget {
                     children: [
                       const Text(
                         'Recent Student Registrations',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       TextButton(
                         onPressed: () => onNavigateToTab(1),
@@ -284,24 +317,38 @@ class DashboardScreen extends StatelessWidget {
                         return ListTile(
                           contentPadding: EdgeInsets.zero,
                           leading: CircleAvatar(
-                            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primaryContainer,
                             child: Text(
                               s.name[0].toUpperCase(),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryContainer,
                               ),
                             ),
                           ),
-                          title: Text(s.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                          title: Text(
+                            s.name,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
                           subtitle: Text('${s.studentId} • ${s.department}'),
                           trailing: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: coursesCount > 0 ? Colors.teal.shade50 : Colors.orange.shade50,
+                              color: coursesCount > 0
+                                  ? Colors.teal.shade50
+                                  : Colors.orange.shade50,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: coursesCount > 0 ? Colors.teal.shade300 : Colors.orange.shade300,
+                                color: coursesCount > 0
+                                    ? Colors.teal.shade300
+                                    : Colors.orange.shade300,
                               ),
                             ),
                             child: Text(
@@ -309,7 +356,9 @@ class DashboardScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: coursesCount > 0 ? Colors.teal.shade800 : Colors.orange.shade800,
+                                color: coursesCount > 0
+                                    ? Colors.teal.shade800
+                                    : Colors.orange.shade800,
                               ),
                             ),
                           ),

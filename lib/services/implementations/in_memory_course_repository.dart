@@ -1,3 +1,4 @@
+import '../../core/constants/departments.dart';
 import '../../models/course_model.dart';
 import '../interfaces/course_repository_interface.dart';
 import '../seed/default_data_seeder.dart';
@@ -7,19 +8,13 @@ class InMemoryCourseRepository implements ICourseRepository {
   final List<Course> _courses = [];
 
   InMemoryCourseRepository({IDataSeeder? seeder}) {
-    final initialData = seeder?.seedCourses() ?? DefaultDataSeeder().seedCourses();
+    final initialData =
+        seeder?.seedCourses() ?? DefaultDataSeeder().seedCourses();
     _courses.addAll(initialData);
   }
 
   @override
-  List<String> get availableDepartments => [
-        'All',
-        'Computer Science',
-        'Business Administration',
-        'Information Technology',
-        'Data Science',
-        'Software Engineering',
-      ];
+  List<String> get availableDepartments => Departments.values;
 
   @override
   List<Course> getAllCourses() {

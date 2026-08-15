@@ -9,15 +9,13 @@ class EnrollmentService implements IEnrollmentService {
   final IStudentRepository _studentRepo;
   final ICourseRepository _courseRepo;
 
-  EnrollmentService({
-    required this._studentRepo,
-    required this._courseRepo,
-  });
+  EnrollmentService({required this._studentRepo, required this._courseRepo});
 
   @override
-  int get totalEnrollments => _studentRepo
-      .getAllStudents()
-      .fold(0, (sum, s) => sum + s.enrolledCourseIds.length);
+  int get totalEnrollments => _studentRepo.getAllStudents().fold(
+    0,
+    (sum, s) => sum + s.enrolledCourseIds.length,
+  );
 
   @override
   List<Course> getCoursesForStudent(String studentId) {
@@ -41,8 +39,11 @@ class EnrollmentService implements IEnrollmentService {
   void enrolStudentInCourse(String studentId, String courseId) {
     final student = _studentRepo.getStudentById(studentId);
     if (student != null && !student.enrolledCourseIds.contains(courseId)) {
-      final updatedList = List<String>.from(student.enrolledCourseIds)..add(courseId);
-      _studentRepo.updateStudent(student.copyWith(enrolledCourseIds: updatedList));
+      final updatedList = List<String>.from(student.enrolledCourseIds)
+        ..add(courseId);
+      _studentRepo.updateStudent(
+        student.copyWith(enrolledCourseIds: updatedList),
+      );
     }
   }
 
@@ -50,8 +51,11 @@ class EnrollmentService implements IEnrollmentService {
   void unEnrolStudentFromCourse(String studentId, String courseId) {
     final student = _studentRepo.getStudentById(studentId);
     if (student != null && student.enrolledCourseIds.contains(courseId)) {
-      final updatedList = List<String>.from(student.enrolledCourseIds)..remove(courseId);
-      _studentRepo.updateStudent(student.copyWith(enrolledCourseIds: updatedList));
+      final updatedList = List<String>.from(student.enrolledCourseIds)
+        ..remove(courseId);
+      _studentRepo.updateStudent(
+        student.copyWith(enrolledCourseIds: updatedList),
+      );
     }
   }
 
@@ -59,7 +63,9 @@ class EnrollmentService implements IEnrollmentService {
   void updateStudentEnrollments(String studentId, List<String> courseIds) {
     final student = _studentRepo.getStudentById(studentId);
     if (student != null) {
-      _studentRepo.updateStudent(student.copyWith(enrolledCourseIds: courseIds));
+      _studentRepo.updateStudent(
+        student.copyWith(enrolledCourseIds: courseIds),
+      );
     }
   }
 
@@ -69,7 +75,9 @@ class EnrollmentService implements IEnrollmentService {
       if (student.enrolledCourseIds.contains(courseId)) {
         final updatedList = List<String>.from(student.enrolledCourseIds)
           ..remove(courseId);
-        _studentRepo.updateStudent(student.copyWith(enrolledCourseIds: updatedList));
+        _studentRepo.updateStudent(
+          student.copyWith(enrolledCourseIds: updatedList),
+        );
       }
     }
   }
